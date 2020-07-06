@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "cnode.fullname" . }}-test-connection"
+  labels:
+{{ include "cnode.labels" . | indent 4 }}
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args:  ['{{ include "cnode.fullname" . }}:{{ if .Values.coreOnlyRelease }}{{ .Values.cardanoNode.coreServicePort }}{{ else }}{{ .Values.cardanoNode.relayServicePort }}{{ end }}']
+  restartPolicy: Never

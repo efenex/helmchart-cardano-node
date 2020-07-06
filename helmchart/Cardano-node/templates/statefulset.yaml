@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+{{ if .Values.coreOnlyRelease }}
+  name: core
+  labels:
+{{ include "cnode.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  serviceName: core
+  {{ else }}
+  name: relay
+  labels:
+{{ include "cnode.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.cardanoNode.relayReplicaCount }}
+  serviceName: "relay"
+  {{ end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "cnode.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "cnode.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      volumes:
+      - name: node-config
+        projected:
+          sources:
+            - configMap:
+                name: node-config
+            - configMap:
+                name: node-topology
+            - configMap:
+                name: genesis
+      {{ if .Values.coreOnlyRelease }}
+      - name: node-secrets
+        projected:
+          sources:
+            - secret:
+                name: node-corekeys
+      {{ end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ if .Values.coreOnlyRelease }}{{ .Values.cardanoNode.coreServicePort }}{{ else }}{{ .Values.cardanoNode.relayServicePort }}{{ end }}
+              protocol: TCP
+            - containerPort: {{ .Values.cardanoNode.prometheusPort }}
+              protocol: TCP
+            - containerPort: {{ .Values.cardanoNode.ekgPort }}
+              protocol: TCP
+          volumeMounts:
+          {{ if .Values.persistentVolume.enabled }}
+            - name: db-pvc
+              mountPath: {{ .Values.cardanoNode.dbPath }}
+          {{ end }}
+            - name: node-config
+              mountPath: {{ .Values.cardanoNode.configMapPath }}
+          {{ if .Values.coreOnlyRelease }}
+            - name: node-secrets
+              mountPath: {{ .Values.cardanoNode.secretsPath }}
+          {{ end }}
+          command: ["/bin/bash"]
+          args: 
+            - "-c"
+            - |
+              cardano-node run \
+              --database-path {{ .Values.cardanoNode.dbPath }} \
+              --socket-path  {{ .Values.cardanoNode.socketPath }} \
+              --config {{ .Values.cardanoNode.configMapPath }}/{{ .Values.cardanoNode.configFileConfigMap }} \{{ if .Values.coreOnlyRelease }}
+              --topology {{ .Values.cardanoNode.configMapPath }}/topology.json \
+              --port {{ .Values.cardanoNode.coreServicePort }} \
+              --shelley-kes-key /srv/cardano/cardano-node/priv/kes.skey \
+              --shelley-vrf-key /srv/cardano/cardano-node/priv/vrf.skey \
+              --shelley-operational-certificate /srv/cardano/cardano-node/priv/op.cert{{ else }}
+              --topology {{ .Values.cardanoNode.configMapPath }}/{{ .Values.cardanoNode.topologyConfigMap }} \
+              --port {{ .Values.cardanoNode.relayServicePort }}
+              {{ end }}
+      dnsPolicy: "ClusterFirst"
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{ if .Values.persistentVolume.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: db-pvc
+    spec:
+      accessModes:
+    {{ toYaml .Values.persistentVolume.accessModes | indent 4 }}
+      storageClassName: "{{ .Values.persistentVolume.storageclass }}"
+      resources:
+        requests:
+          storage: "{{ .Values.persistentVolume.size }}"
+  {{ end }}

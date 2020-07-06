@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+{{ if .Values.coreOnlyRelease }}
+  name: core
+  labels:
+{{ include "cnode.labels" . | indent 4 }}
+spec:
+  clusterIP: "None" #Headless Service as per advice from RPST on Telegram
+  ports:
+    - port: {{ .Values.cardanoNode.coreServicePort }}
+      targetPort: {{ .Values.cardanoNode.coreServicePort }}
+      protocol: TCP
+{{ else }}
+  name: relay
+  labels:
+{{ include "cnode.labels" . | indent 4 }}
+spec:
+  type: "{{ .Values.cardanoNode.relayServiceType }}"
+  ports:
+    - port: {{ .Values.cardanoNode.relayServicePort }}
+      targetPort: {{ .Values.cardanoNode.relayServicePort }}
+      protocol: TCP
+{{ end }}
+  selector:
+    app.kubernetes.io/name: {{ include "cnode.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

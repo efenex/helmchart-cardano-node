@@ -1,0 +1,312 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: node-topology
+data:
+  topologyiohk.json: |
+    {
+    "Producers": [
+        {
+        "addr": "relays-new.shelley-testnet.dev.cardano.org",
+        "port": 3001,
+        "valency": 2
+        }
+    ]
+    }
+{{ if .Values.coreOnlyRelease }}
+  topology.json: |
+    {
+      "Producers":
+        [
+          {
+            "addr": "relay-0.relay.passive.svc.cluster.local",
+            "port": {{ .Values.cardanoNode.relayServicePort }},
+            "valency": 1
+          },
+          {
+            "addr": "relay-1.relay.passive.svc.cluster.local",
+            "port": {{ .Values.cardanoNode.relayServicePort }},
+            "valency": 1
+          },
+          {
+            "addr": "relay-2.relay.passive.svc.cluster.local",
+            "port": {{ .Values.cardanoNode.relayServicePort }},
+            "valency": 1
+          }
+        ]
+    }
+ {{ else }}   
+  relay-0-topology.json: |
+    {
+        "Producers": [
+            {
+                "addr": "core-0.core.cheap.svc.cluster.local",
+                "port": {{ .Values.cardanoNode.coreServicePort }},
+                "valency": 1
+            },
+            {
+                "addr": "relay-1.relay.passive.svc.cluster.local",
+                "port": {{ .Values.cardanoNode.relayServicePort }},
+                "valency": 1
+            },
+            {
+                "addr": "relay-2.relay.passive.svc.cluster.local",
+                "port": {{ .Values.cardanoNode.relayServicePort }},
+                "valency": 1
+            },
+            {
+                "addr": "relays-new.shelley-testnet.dev.cardano.org",
+                "port": 3001,
+                "valency": 2
+            },
+            {
+                "type": "regular",
+                "pool": "6de7e...e96eb",
+                "addr": "relay2.oqulent.com",
+                "port": 3008,
+                "valency": 1
+            },
+            {
+                "type": "regular",
+                "pool": "[TITAN] TITAN",
+                "addr": "r-us-0.titanstaking.io",
+                "port": 4321,
+                "valency": 1
+            },
+            {
+                "type": "regular",
+                "pool": "ff704...0ceef",
+                "addr": "35.247.202.245",
+                "port": 6002,
+                "valency": 1
+            },
+            {
+                "type": "regular",
+                "pool": "[ONYX1] ONYX Stake Pool #1",
+                "addr": "34.223.107.64",
+                "port": 3001,
+                "valency": 1
+            },
+            {
+                "type": "regular",
+                "pool": "[ACL] A CardanoLand Pool",
+                "addr": "relay2.cardanoland.com",
+                "port": 8000,
+                "valency": 1
+            },
+            {
+                "type": "additional-world-relay",
+                "pool": "[SAFE] SafeStak",
+                "addr": "r0.eun.test.safestak.com",
+                "port": 3001,
+                "valency": 1
+            },
+            {
+                "node": "DIGI",
+                "addr": "relay1.digitalfortress.online",
+                "port": 3001,
+                "valency": 5
+            },
+            {
+                "operator": "cheapstaking",
+                "addr": "spicy.cheapstaking.com",
+                "port": 3011,
+                "valency": 1
+            },
+            {
+                "operator": "Kiwipool Staking R2-UNITY",
+                "addr": "unity.kiwipool.org",
+                "port": 9636,
+                "valency": 1
+            },
+            {
+                "operator": "Kiwipool Staking R1-LOVE",
+                "addr": "love.kiwipool.org",
+                "port": 9636,
+                "valency": 1
+            } 
+        ]
+    }
+  relay-1-topology.json: |
+    {
+        "Producers": [
+            {
+                "addr": "core-0.core.cheap.svc.cluster.local",
+                "port": {{ .Values.cardanoNode.coreServicePort }},
+                "valency": 1
+            },
+            {
+                "addr": "relay-0.relay.passive.svc.cluster.local",
+                "port": {{ .Values.cardanoNode.relayServicePort }},
+                "valency": 1
+            },
+            {
+                "addr": "relay-2.relay.passive.svc.cluster.local",
+                "port": {{ .Values.cardanoNode.relayServicePort }},
+                "valency": 1
+            },
+            {
+                "addr": "relays-new.shelley-testnet.dev.cardano.org",
+                "port": 3001,
+                "valency": 2
+            },
+            {
+                "type": "regular",
+                "pool": "4c07d...c220f",
+                "addr": "70.35.195.173",
+                "port": 3000,
+                "valency": 1
+            },
+            {
+                "type": "regular",
+                "pool": "[QFR] quirky freckle",
+                "addr": "35.189.41.194",
+                "port": 3001,
+                "valency": 1
+            },
+            {
+                "type": "regular",
+                "pool": "[pool] MoxieStakePool",
+                "addr": "3.15.28.251",
+                "port": 8082,
+                "valency": 1
+            },
+            {
+                "type": "regular",
+                "pool": "[ONYX1] ONYX Stake Pool #1",
+                "addr": "34.223.107.64",
+                "port": 3001,
+                "valency": 1
+            },
+            {
+                "type": "regular",
+                "pool": "[ACL] A CardanoLand Pool",
+                "addr": "relay2.cardanoland.com",
+                "port": 8000,
+                "valency": 1
+            },
+            {
+                "type": "additional-world-relay",
+                "pool": "[SAFE] SafeStak",
+                "addr": "r0.eun.test.safestak.com",
+                "port": 3001,
+                "valency": 1
+            },
+            {
+                "node": "DIGI",
+                "addr": "relay1.digitalfortress.online",
+                "port": 3001,
+                "valency": 5
+            },
+            {
+                "operator": "cheapstaking",
+                "addr": "spicy.cheapstaking.com",
+                "port": 3011,
+                "valency": 1
+            },
+            {
+                "operator": "Kiwipool Staking R2-UNITY",
+                "addr": "unity.kiwipool.org",
+                "port": 9636,
+                "valency": 1
+            },
+            {
+                "operator": "Kiwipool Staking R1-LOVE",
+                "addr": "love.kiwipool.org",
+                "port": 9636,
+                "valency": 1
+            } 
+        ]
+    }
+  relay-2-topology.json: |
+    {
+        "Producers": [
+            {
+                "addr": "core-0.core.cheap.svc.cluster.local",
+                "port": {{ .Values.cardanoNode.coreServicePort }},
+                "valency": 1
+            },
+            {
+                "addr": "relay-0.relay.passive.svc.cluster.local",
+                "port": {{ .Values.cardanoNode.relayServicePort }},
+                "valency": 1
+            },
+            {
+                "addr": "relay-1.relay.passive.svc.cluster.local",
+                "port": {{ .Values.cardanoNode.relayServicePort }},
+                "valency": 1
+            },
+            {
+                "addr": "relays-new.shelley-testnet.dev.cardano.org",
+                "port": 3001,
+                "valency": 2
+            },
+            {
+                "type": "regular",
+                "pool": "[BLOC] BLOC pool",
+                "addr": "167.71.109.11",
+                "port": 3001,
+                "valency": 1
+            },
+            {
+                "type": "regular",
+                "pool": "[369] TESLA 369",
+                "addr": "35.231.129.99",
+                "port": 8082,
+                "valency": 1
+            },
+            {
+                "type": "regular",
+                "pool": "[ADAMS] ADAMS_an_Arcadia_Stakepool",
+                "addr": "3.81.28.132",
+                "port": 3002,
+                "valency": 1
+            },
+            {
+                "type": "regular",
+                "pool": "[ONYX1] ONYX Stake Pool #1",
+                "addr": "34.223.107.64",
+                "port": 3001,
+                "valency": 1
+            },
+            {
+                "type": "regular",
+                "pool": "[ACL] A CardanoLand Pool",
+                "addr": "relay2.cardanoland.com",
+                "port": 8000,
+                "valency": 1
+            },
+            {
+                "type": "additional-world-relay",
+                "pool": "[SAFE] SafeStak",
+                "addr": "r0.eun.test.safestak.com",
+                "port": 3001,
+                "valency": 1
+            },
+            {
+                "node": "DIGI",
+                "addr": "relay1.digitalfortress.online",
+                "port": 3001,
+                "valency": 5
+            },
+            {
+                "operator": "cheapstaking",
+                "addr": "spicy.cheapstaking.com",
+                "port": 3011,
+                "valency": 1
+            },
+            {
+                "operator": "Kiwipool Staking R2-UNITY",
+                "addr": "unity.kiwipool.org",
+                "port": 9636,
+                "valency": 1
+            },
+            {
+                "operator": "Kiwipool Staking R1-LOVE",
+                "addr": "love.kiwipool.org",
+                "port": 9636,
+                "valency": 1
+            } 
+        ]
+    }
+{{ end }}

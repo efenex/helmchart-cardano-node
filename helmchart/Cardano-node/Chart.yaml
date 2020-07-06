@@ -1,0 +1,9 @@
+apiVersion: v1
+appVersion: "1.14.2"
+description: A Helm chart for Cardano Node
+name: cnode
+version: 0.1.3
+maintainers: 
+  - name: CheapStaking StakePool
+    email: team@cheapstaking.com
+    url: https://cheapstaking.com

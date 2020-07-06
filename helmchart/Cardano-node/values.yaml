@@ -1,0 +1,38 @@
+# decoupled Core & relays to handle upgrades and multipool operations deployments, true = 1 core node
+# Relays to be its deployment release & namespace, same for core deployments when coreOnlyRelease=true 
+# Defaults only deploy relay servers
+coreOnlyRelease: false
+
+cardanoNode:
+  relayReplicaCount: 3
+  relayServiceType: LoadBalancer
+  relayServicePort: 3012
+  coreServicePort: 3099
+  prometheusPort: 12701
+  ekgPort: 12702
+  dbPath: /srv/cardano/cardano-node/storage/db
+  configMapPath: /srv/cardano/cardano-node/configmaps
+  secretsPath: /srv/cardano/cardano-node/priv
+  topologyConfigMap: $HOSTNAME-topology.json #use topologyiohk.json for first sync to get to tip faster
+  configFileConfigMap: config.json
+  socketPath: /srv/cardano/cardano-node/etc/node.socket
+
+persistentVolume:
+  enabled: true
+  storageclass: azurefile-zrs # replace with default or your Private Cluster \ Cloud providers storageClass
+    ## Must match those of dynamic provisioner
+    ## Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+  accessModes:
+    - ReadWriteOnce
+  ## Cardano node data Persistent Volume size
+  size: 150Gi # Current Mainnet DB July 2020 = 87gb
+
+image:
+  repository: 2ndlayer/centos-cardano-node
+  tag: 1.14.2
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+nodeSelector: {}
