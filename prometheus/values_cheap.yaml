@@ -2355,7 +2355,7 @@ serverFiles:
       - job_name: prometheus
         static_configs:
           - targets:
-              - cheap-core-0.cheap-core.fftestnet.svc.cluster.local:12701
+              - core-0.cheap.fftestnet.svc.cluster.local:12701
             labels:
               pool: "cheap"
               alias: "cheap"
